@@ -1,0 +1,220 @@
+﻿@model CEMS.Models.ViewModels.OrganizerDashboardViewModel
+
+@{
+    ViewData["Title"] = "My Dashboard";
+}
+
+<div class="page-header">
+    <h1 class="page-title">My Dashboard</h1>
+    <p class="page-subtitle">
+        Monitor your event activity, registration performance, and approval progress from one organizer workspace.
+    </p>
+</div>
+
+@if (Model.TotalEvents == 0)
+{
+    <div class="empty-state">
+        <h5>No events created yet</h5>
+        <p>You have not created any events yet. Start by creating your first campus event.</p>
+
+        <div class="mt-3 d-flex flex-wrap justify-content-center gap-2">
+            <a asp-controller="Events" asp-action="Create" class="btn btn-primary">
+                Create First Event
+            </a>
+            <a asp-controller="Events" asp-action="ApprovedEvents" class="btn btn-outline-secondary">
+                Browse Approved Events
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="content-card mb-4">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-8">
+                <h4 class="mb-2">Organizer Overview</h4>
+                <p class="subtle-text mb-0">
+                    Use this dashboard to monitor event outcomes, registration activity, scheduling status, and approval progress.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a asp-controller="Events" asp-action="Create" class="btn btn-primary">
+                    Create New Event
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="content-card mt-4">
+        <h4 class="mb-3">Advanced Insights</h4>
+        <p class="subtle-text mb-3">
+            Review your most active event and the next scheduled event from your organizer portfolio.
+        </p>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                    <div class="data-label mb-1">Most Registered Event</div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.MostRegisteredEventTitle))
+                    {
+                        <div class="fw-bold mb-1">@Model.MostRegisteredEventTitle</div>
+                        <div class="subtle-text">
+                            Total registrations:
+                            <strong>@Model.MostRegisteredEventCount</strong>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="subtle-text">No registration activity available yet.</div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                    <div class="data-label mb-1">Next Upcoming Event</div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.NextUpcomingEventTitle) && Model.NextUpcomingEventDate.HasValue)
+                    {
+                        <div class="fw-bold mb-1">@Model.NextUpcomingEventTitle</div>
+                        <div class="subtle-text">
+                            @Model.NextUpcomingEventDate.Value.ToString("dddd, MMM dd, yyyy - hh:mm tt")
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="subtle-text">No upcoming events scheduled at the moment.</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-6 col-xl-3">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Events</h5>
+                    <p class="card-text" data-counter>@Model.TotalEvents</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Pending</h5>
+                    <p class="card-text" data-counter>@Model.PendingEvents</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Approved</h5>
+                    <p class="card-text" data-counter>@Model.ApprovedEvents</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Rejected</h5>
+                    <p class="card-text" data-counter>@Model.RejectedEvents</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-lg-8">
+            <div class="content-card h-100">
+                <h4 class="mb-3">Organizer Summary</h4>
+                <p class="subtle-text mb-3">
+                    This dashboard gives you a quick view of event status, participation volume, and event timing across your organizer account.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                            <div class="data-label mb-1">Upcoming Events</div>
+                            <div class="stat-number" data-counter>@Model.UpcomingEvents</div>
+                            <div class="subtle-text">Events that are still scheduled ahead.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                            <div class="data-label mb-1">Past Events</div>
+                            <div class="stat-number" data-counter>@Model.PastEvents</div>
+                            <div class="subtle-text">Events that have already taken place.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                            <div class="data-label mb-1">Total Registrations</div>
+                            <div class="stat-number" data-counter>@Model.TotalRegistrations</div>
+                            <div class="subtle-text">Registrations received across all your events.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                            <div class="data-label mb-1">Pending Review</div>
+                            <div class="stat-number" data-counter>@Model.PendingEvents</div>
+                            <div class="subtle-text">Events waiting for staff approval.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                            <div class="data-label mb-1">Approved Events</div>
+                            <div class="stat-number" data-counter>@Model.ApprovedEvents</div>
+                            <div class="subtle-text">Events currently available for student registration.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                            <div class="data-label mb-1">Rejected Events</div>
+                            <div class="stat-number" data-counter>@Model.RejectedEvents</div>
+                            <div class="subtle-text">Events that may need updates or resubmission.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="content-card h-100">
+                <h4 class="mb-3">Quick Actions</h4>
+
+                <div class="d-grid gap-2">
+                    <a asp-controller="Events" asp-action="Create" class="btn btn-primary">
+                        Create New Event
+                    </a>
+
+                    <a asp-controller="Events" asp-action="Index" class="btn btn-outline-secondary">
+                        View My Events
+                    </a>
+
+                    <a asp-controller="Events" asp-action="ApprovedEvents" class="btn btn-outline-secondary">
+                        Browse Approved Events
+                    </a>
+                </div>
+
+                <hr class="my-4" />
+
+                <p class="subtle-text mb-0">
+                    Keep your event submissions organized and use this dashboard as your central organizer workspace.
+                </p>
+            </div>
+        </div>
+    </div>
+}

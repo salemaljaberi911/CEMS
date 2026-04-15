@@ -1,0 +1,143 @@
+﻿@model IEnumerable<CEMS.Models.ViewModels.AttendanceViewModel>
+
+@{
+    ViewData["Title"] = "Manage Attendance";
+
+    var totalRegistrations = Model.Count();
+    var attendedCount = Model.Count(x => x.IsAttended);
+    var notMarkedCount = totalRegistrations - attendedCount;
+}
+
+<div class="page-header">
+    <h1 class="page-title">Manage Attendance</h1>
+    <p class="page-subtitle">
+        Review registered participants and update attendance status for the selected event.
+    </p>
+</div>
+
+<div class="content-card mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <div class="data-label">Selected Event</div>
+            <div class="data-value fs-5 fw-bold">@ViewBag.EventTitle</div>
+        </div>
+
+        <div>
+            <a asp-controller="Events" asp-action="ApprovedEvents" class="btn btn-outline-secondary btn-sm">
+                Back to Approved Events
+            </a>
+        </div>
+    </div>
+</div>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info mb-4">
+        @TempData["Message"]
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <h5>No registrations found</h5>
+        <p>No users have registered for this event yet.</p>
+    </div>
+}
+else
+{
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Registrations</h5>
+                    <p class="card-text" data-counter>@totalRegistrations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Attended</h5>
+                    <p class="card-text" data-counter>@attendedCount</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Not Marked</h5>
+                    <p class="card-text" data-counter>@notMarkedCount</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="row g-3 mb-3">
+            <div class="col-md-8">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Search participants by name or email..."
+                       data-table-search="attendanceTable" />
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle" id="attendanceTable">
+                <thead>
+                <tr>
+                    <th>Participant</th>
+                    <th>Email</th>
+                    <th>Registered At</th>
+                    <th>Attendance Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@item.FullName</strong>
+                        </td>
+                        <td>@item.Email</td>
+                        <td>@item.RegisteredAt.ToString("ddd, MMM dd, yyyy - hh:mm tt")</td>
+                        <td data-status="@(item.IsAttended ? "Attended" : "NotMarked")">
+                            @if (item.IsAttended)
+                            {
+                                <span class="badge badge-status badge-approved">Attended</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-status badge-pending">Not Marked</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (!item.IsAttended)
+                            {
+                                <form asp-action="MarkAttendance" asp-route-id="@item.RegistrationId" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="btn btn-primary btn-sm"
+                                            data-confirm="Mark this participant as attended?">
+                                        Mark as Attended
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    Already Marked
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

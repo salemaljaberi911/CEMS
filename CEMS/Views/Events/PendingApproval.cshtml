@@ -1,0 +1,105 @@
+﻿@model IEnumerable<CEMS.Models.Event>
+
+@{
+    ViewData["Title"] = "Pending Approval";
+}
+
+<div class="page-header">
+    <h1 class="page-title">Pending Approval</h1>
+    <p class="page-subtitle">
+        Review submitted campus events and decide whether each event should be approved or rejected before publication.
+    </p>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <h5>No pending events</h5>
+        <p>There are currently no event submissions waiting for approval.</p>
+    </div>
+}
+else
+{
+    <div class="content-card">
+        <div class="row g-3 mb-3">
+            <div class="col-md-8">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Search pending events..."
+                       data-table-search="pendingApprovalTable" />
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle" id="pendingApprovalTable">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Event Date</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@item.Title</strong>
+                        </td>
+                        <td>
+                            @{
+                                var shortDescription = item.Description.Length > 100
+                                    ? item.Description.Substring(0, 100) + "..."
+                                    : item.Description;
+                            }
+                            <span class="subtle-text">@shortDescription</span>
+                        </td>
+                        <td>@item.EventDate.ToString("ddd, MMM dd, yyyy - hh:mm tt")</td>
+                        <td>@item.Location</td>
+                        <td>@item.Capacity</td>
+                        <td>
+                            @if (item.Status == "Pending")
+                            {
+                                <span class="badge badge-status badge-pending">Pending</span>
+                            }
+                            else if (item.Status == "Approved")
+                            {
+                                <span class="badge badge-status badge-approved">Approved</span>
+                            }
+                            else if (item.Status == "Rejected")
+                            {
+                                <span class="badge badge-status badge-rejected">Rejected</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@item.Status</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2 flex-wrap">
+                                <form asp-action="Approve" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-success btn-sm" data-confirm="Approve this event?">
+                                        Approve
+                                    </button>
+                                </form>
+
+                                <form asp-action="Reject" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger btn-sm" data-confirm="Reject this event?">
+                                        Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

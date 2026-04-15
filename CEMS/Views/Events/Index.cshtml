@@ -1,0 +1,233 @@
+@model IEnumerable<CEMS.Models.ViewModels.OrganizerEventListViewModel>
+
+@{
+    ViewData["Title"] = "My Events";
+
+    var totalEvents = Model.Count();
+    var upcomingEvents = Model.Count(e => e.IsUpcoming);
+    var pastEvents = totalEvents - upcomingEvents;
+}
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h1 class="page-title">My Events</h1>
+        <p class="page-subtitle">
+            Manage the events you created, monitor approval status, and review registration activity.
+        </p>
+    </div>
+
+    <div>
+        <a asp-action="Create" class="btn btn-primary">
+            Create New Event
+        </a>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <h5>No events created yet</h5>
+        <p>You have not created any events yet. Start by creating your first campus event.</p>
+
+        <div class="mt-3">
+            <a asp-action="Create" class="btn btn-primary">
+                Create First Event
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row g-3 mb-4 reveal-on-scroll">
+        <div class="col-md-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Events</h5>
+                    <p class="card-text" data-counter>@totalEvents</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Upcoming</h5>
+                    <p class="card-text" data-counter>@upcomingEvents</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Past Events</h5>
+                    <p class="card-text" data-counter>@pastEvents</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section-spacing reveal-on-scroll">
+        <div class="content-card">
+            <div class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Search your events..."
+                           data-card-search="myEventsCards" />
+                </div>
+
+                <div class="col-md-3">
+                    <select class="form-select" id="myEventsStatusFilter">
+                        <option value="all">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="myEventsCards">
+                <div class="row g-4">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col-md-6 col-xl-4 search-card" data-event-status="@item.Status">
+                            <div class="content-card h-100 d-flex flex-column">
+
+                                @if (item.ImageData != null && item.ImageContentType != null)
+                                {
+                                    var base64 = Convert.ToBase64String(item.ImageData);
+                                    var imageSrc = $"data:{item.ImageContentType};base64,{base64}";
+
+                                    <div class="mb-3">
+                                        <img src="@imageSrc"
+                                             alt="@item.Title"
+                                             class="img-fluid rounded-soft w-100"
+                                             style="height: 220px; object-fit: cover;" />
+                                    </div>
+                                }
+
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                    <div>
+                                        <h4 class="mb-1">@item.Title</h4>
+                                        <div class="subtle-text">@item.Location</div>
+                                    </div>
+
+                                    <div class="text-end d-flex flex-column gap-2">
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <span class="badge badge-status badge-pending">Pending</span>
+                                        }
+                                        else if (item.Status == "Approved")
+                                        {
+                                            <span class="badge badge-status badge-approved">Approved</span>
+                                        }
+                                        else if (item.Status == "Rejected")
+                                        {
+                                            <span class="badge badge-status badge-rejected">Rejected</span>
+                                        }
+
+                                        @if (item.IsUpcoming)
+                                        {
+                                            <span class="badge badge-status badge-approved">Upcoming</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-status badge-rejected">Past</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <p class="subtle-text mb-3">
+                                    @{
+                                        var shortDescription = item.Description.Length > 120
+                                            ? item.Description.Substring(0, 120) + "..."
+                                            : item.Description;
+                                    }
+                                    @shortDescription
+                                </p>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                            <div class="data-label mb-1">Event Date</div>
+                                            <div class="subtle-text">@item.EventDate.ToString("MMM dd, yyyy")</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                            <div class="data-label mb-1">Time</div>
+                                            <div class="subtle-text">@item.EventDate.ToString("hh:mm tt")</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                            <div class="data-label mb-1">Capacity</div>
+                                            <div class="subtle-text">@item.Capacity</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                            <div class="data-label mb-1">Registrations</div>
+                                            <div class="subtle-text">@item.RegistrationCount</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                            <div class="data-label mb-1">Remaining Seats</div>
+                                            <div class="subtle-text">@item.RemainingSeats</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-auto d-flex flex-wrap gap-2">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm">
+                                        Edit
+                                    </a>
+
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                        Details
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-danger btn-sm"
+                                       data-confirm="Are you sure you want to delete this event?">
+                                        Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const statusFilter = document.getElementById("myEventsStatusFilter");
+            const cards = document.querySelectorAll("#myEventsCards .search-card");
+
+            if (!statusFilter || !cards.length) return;
+
+            statusFilter.addEventListener("change", function () {
+                const selected = this.value.toLowerCase();
+
+                cards.forEach(card => {
+                    const status = (card.getAttribute("data-event-status") || "").toLowerCase();
+
+                    if (selected === "all" || status === selected) {
+                        card.style.display = "";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,324 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="section-spacing reveal-on-scroll">
+    <div class="content-card hero-highlight">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <div class="mb-3 d-flex flex-wrap gap-2">
+                    <span class="badge badge-status badge-approved">Role-Based Access</span>
+                    <span class="badge badge-status badge-pending">Approval Workflow</span>
+                    <span class="badge badge-status badge-approved">Registration Tracking</span>
+                </div>
+
+                <div class="page-header mb-3">
+                    <h1 class="page-title">Campus Event Management System</h1>
+                    <p class="page-subtitle">
+                        A centralized campus events platform built to help organizers publish events, staff coordinators control approvals,
+                        and students discover and register for approved activities in one professional portal.
+                    </p>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a asp-controller="Events" asp-action="ApprovedEvents" class="btn btn-primary">
+                        Browse Approved Events
+                    </a>
+
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        @if (User.IsInRole("Organizer"))
+                        {
+                            <a asp-controller="Events" asp-action="MyDashboard" class="btn btn-outline-secondary">
+                                Open Dashboard
+                            </a>
+                        }
+                        else if (User.IsInRole("StaffCoordinator"))
+                        {
+                            <a asp-controller="Events" asp-action="PendingApproval" class="btn btn-outline-secondary">
+                                Review Pending Events
+                            </a>
+                        }
+                        else if (User.IsInRole("Student"))
+                        {
+                            <a asp-controller="Events" asp-action="MyRegistrations" class="btn btn-outline-secondary">
+                                View My Registrations
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-secondary">
+                            Create Account
+                        </a>
+                    }
+                </div>
+
+                <div class="row g-3 mt-4">
+                    <div class="col-sm-4">
+                        <div class="feature-panel h-100">
+                            <div class="data-label mb-1">Approval Workflow</div>
+                            <div class="subtle-text">Submit, review, approve, and publish events efficiently.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <div class="feature-panel h-100">
+                            <div class="data-label mb-1">Capacity Control</div>
+                            <div class="subtle-text">Prevent overbooking with event capacity validation.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <div class="feature-panel h-100">
+                            <div class="data-label mb-1">Attendance Support</div>
+                            <div class="subtle-text">Track registrations, attendance, and participation flow.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="content-card h-100">
+                    <h4 class="mb-3">Why CEMS Portal?</h4>
+                    <p class="subtle-text mb-4">
+                        CEMS Portal supports the full campus event lifecycle — from creation and approval to registration,
+                        attendance management, and organizer visibility.
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="feature-panel">
+                                <div class="data-label mb-1">For Organizers</div>
+                                <div class="subtle-text">Create, manage, and monitor your event submissions from one dashboard.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="feature-panel">
+                                <div class="data-label mb-1">For Staff Coordinators</div>
+                                <div class="subtle-text">Review pending submissions and manage event attendance records.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="feature-panel">
+                                <div class="data-label mb-1">For Students</div>
+                                <div class="subtle-text">Explore approved events, register easily, and manage participation history.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-spacing reveal-on-scroll">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Event Creation</h5>
+                    <p class="subtle-text mb-0">
+                        Organizers can submit professional event listings with titles, descriptions, event dates,
+                        locations, capacities, and approval tracking.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Approval Workflow</h5>
+                    <p class="subtle-text mb-0">
+                        Staff coordinators can review event requests, approve valid submissions,
+                        reject incomplete events, and maintain operational quality.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Registration & Attendance</h5>
+                    <p class="subtle-text mb-0">
+                        Students can register for approved events, avoid duplicate registration,
+                        and support attendance workflows for real participation management.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-spacing reveal-on-scroll">
+    <div class="content-card">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-8">
+                <h2 class="mb-2">Built for structured campus operations</h2>
+                <p class="subtle-text mb-0">
+                    This platform supports approval control, role-based access, event ownership,
+                    registration workflow, capacity validation, and attendance monitoring for campus operations.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a asp-controller="Events" asp-action="ApprovedEvents" class="btn btn-primary">
+                    View Live Events
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-spacing reveal-on-scroll">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="content-card h-100">
+                <h4 class="mb-3">What you can do</h4>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2 subtle-text">• Create and manage event submissions</li>
+                    <li class="mb-2 subtle-text">• Review and approve campus events</li>
+                    <li class="mb-2 subtle-text">• Register students for approved activities</li>
+                    <li class="mb-2 subtle-text">• Enforce event capacity rules</li>
+                    <li class="mb-0 subtle-text">• Track attendance status efficiently</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="content-card h-100">
+                <h4 class="mb-3">Designed for a real workflow</h4>
+                <p class="subtle-text mb-3">
+                    CEMS Portal is structured around real operational roles so each user sees only the tools relevant to their responsibilities.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="feature-panel h-100">
+                            <div class="data-label mb-1">Student Access</div>
+                            <div class="subtle-text">Browse events, register, and manage participation.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="feature-panel h-100">
+                            <div class="data-label mb-1">Organizer Access</div>
+                            <div class="subtle-text">Create events, monitor statuses, and manage submissions.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="feature-panel h-100">
+                            <div class="data-label mb-1">Staff Access</div>
+                            <div class="subtle-text">Approve events and manage attendance operations.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-spacing reveal-on-scroll">
+    <div class="stats-strip">
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="stat-value" data-counter>120</div>
+                <div class="stat-label">Approved Events Managed</div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-value" data-counter>850</div>
+                <div class="stat-label">Student Registrations</div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-value" data-counter>96</div>
+                <div class="stat-label">Attendance Records Tracked</div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-value" data-counter>3</div>
+                <div class="stat-label">Operational User Roles</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-spacing reveal-on-scroll">
+    <div class="content-card">
+        <div class="text-center mb-4">
+            <h2 class="mb-2">Built for campus teams</h2>
+            <p class="subtle-text mb-0">
+                Designed for structured academic workflows, event governance, and student engagement.
+            </p>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-3 col-6">
+                <div class="logo-chip">Student Affairs</div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="logo-chip">Campus Life</div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="logo-chip">Academic Events</div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="logo-chip">Student Clubs</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-spacing reveal-on-scroll">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="testimonial-card">
+                <div class="quote-mark mb-3">“</div>
+                <p class="subtle-text">
+                    The organizer dashboard makes it easier to manage submissions, monitor approvals, and track event participation.
+                </p>
+                <div class="data-label mt-3">Organizer Experience</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="testimonial-card">
+                <div class="quote-mark mb-3">“</div>
+                <p class="subtle-text">
+                    Staff can quickly review pending events and keep the approval workflow clean and organized.
+                </p>
+                <div class="data-label mt-3">Staff Coordinator Experience</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="testimonial-card">
+                <div class="quote-mark mb-3">“</div>
+                <p class="subtle-text">
+                    Students can discover approved activities, register with fewer steps, and manage participation easily.
+                </p>
+                <div class="data-label mt-3">Student Experience</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-spacing reveal-on-scroll">
+    <div class="cta-banner">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-8">
+                <h2 class="mb-2">Ready to streamline campus event operations?</h2>
+                <p class="subtle-text mb-0">
+                    Centralize event creation, approvals, registration workflow, and attendance management in one modern platform.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a asp-controller="Events" asp-action="ApprovedEvents" class="btn btn-light">
+                    Explore Events
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

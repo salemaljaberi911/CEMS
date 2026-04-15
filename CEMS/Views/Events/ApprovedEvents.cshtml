@@ -1,0 +1,305 @@
+﻿@model IEnumerable<CEMS.Models.Event>
+
+@{
+    ViewData["Title"] = "Approved Events";
+
+    var upcomingEvents = Model
+        .Where(e => e.EventDate >= DateTime.Now)
+        .OrderBy(e => e.EventDate)
+        .ToList();
+
+    var pastEvents = Model
+        .Where(e => e.EventDate < DateTime.Now)
+        .OrderByDescending(e => e.EventDate)
+        .ToList();
+}
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h1 class="page-title">Approved Events</h1>
+        <p class="page-subtitle">
+            Browse officially approved campus events available for registration and participation.
+        </p>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <h5>No approved events available</h5>
+        <p>Please check back later for upcoming campus activities.</p>
+    </div>
+}
+else
+{
+    <div class="row g-3 mb-4 reveal-on-scroll">
+        <div class="col-md-6 col-xl-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Approved</h5>
+                    <p class="card-text" data-counter>@Model.Count()</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Upcoming</h5>
+                    <p class="card-text" data-counter>@upcomingEvents.Count</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="dashboard-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Past Events</h5>
+                    <p class="card-text" data-counter>@pastEvents.Count</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section-spacing reveal-on-scroll">
+        <div class="content-card">
+            <div class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Search upcoming events..."
+                           data-card-search="upcomingApprovedEventsCards" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <h4 class="mb-1">Upcoming Approved Events</h4>
+                <p class="subtle-text mb-0">
+                    View currently available and upcoming campus events open for participation.
+                </p>
+            </div>
+
+            @if (!upcomingEvents.Any())
+            {
+                <div class="empty-state">
+                    <h5>No upcoming approved events</h5>
+                    <p>There are currently no upcoming approved events available.</p>
+                </div>
+            }
+            else
+            {
+                <div id="upcomingApprovedEventsCards">
+                    <div class="row g-4">
+                        @foreach (var item in upcomingEvents)
+                        {
+                            <div class="col-md-6 col-xl-4 search-card">
+                                <div class="content-card h-100 d-flex flex-column">
+
+                                    @if (item.ImageData != null && item.ImageContentType != null)
+                                    {
+                                        var base64 = Convert.ToBase64String(item.ImageData);
+                                        var imageSrc = $"data:{item.ImageContentType};base64,{base64}";
+
+                                        <div class="mb-3">
+                                            <img src="@imageSrc"
+                                                 alt="@item.Title"
+                                                 class="img-fluid rounded-soft w-100"
+                                                 style="height: 220px; object-fit: cover;" />
+                                        </div>
+                                    }
+
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                        <div>
+                                            <h4 class="mb-1">@item.Title</h4>
+                                            <div class="subtle-text">@item.Location</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge badge-status badge-approved">Upcoming</span>
+                                        </div>
+                                    </div>
+
+                                    <p class="subtle-text mb-3">
+                                        @{
+                                            var shortDescription = item.Description.Length > 120
+                                                ? item.Description.Substring(0, 120) + "..."
+                                                : item.Description;
+                                        }
+                                        @shortDescription
+                                    </p>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-6">
+                                            <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                                <div class="data-label mb-1">Event Date</div>
+                                                <div class="subtle-text">@item.EventDate.ToString("MMM dd, yyyy")</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                                <div class="data-label mb-1">Time</div>
+                                                <div class="subtle-text">@item.EventDate.ToString("hh:mm tt")</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                                <div class="data-label mb-1">Capacity</div>
+                                                <div class="subtle-text">@item.Capacity participants</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                                <div class="data-label mb-1">Status</div>
+                                                <div class="mt-1">
+                                                    <span class="badge badge-status badge-approved">Approved</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-auto d-flex flex-wrap gap-2">
+                                        <a asp-action="ApprovedDetails" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                            View Details
+                                        </a>
+
+                                        @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("StaffCoordinator"))
+                                        {
+                                            <a asp-action="ManageAttendance"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-warning btn-sm">
+                                                Attendance
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="section-spacing reveal-on-scroll">
+        <div class="content-card">
+            <div class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Search past events..."
+                           data-card-search="pastApprovedEventsCards" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <h4 class="mb-1">Past Approved Events</h4>
+                <p class="subtle-text mb-0">
+                    Review previously completed approved events and historical activity.
+                </p>
+            </div>
+
+            @if (!pastEvents.Any())
+            {
+                <div class="empty-state">
+                    <h5>No past approved events</h5>
+                    <p>There are no completed approved events to display yet.</p>
+                </div>
+            }
+            else
+            {
+                <div id="pastApprovedEventsCards">
+                    <div class="row g-4">
+                        @foreach (var item in pastEvents)
+                        {
+                            <div class="col-md-6 col-xl-4 search-card">
+                                <div class="content-card h-100 d-flex flex-column">
+
+                                    @if (item.ImageData != null && item.ImageContentType != null)
+                                    {
+                                        var base64 = Convert.ToBase64String(item.ImageData);
+                                        var imageSrc = $"data:{item.ImageContentType};base64,{base64}";
+
+                                        <div class="mb-3">
+                                            <img src="@imageSrc"
+                                                 alt="@item.Title"
+                                                 class="img-fluid rounded-soft w-100"
+                                                 style="height: 220px; object-fit: cover;" />
+                                        </div>
+                                    }
+
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                        <div>
+                                            <h4 class="mb-1">@item.Title</h4>
+                                            <div class="subtle-text">@item.Location</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge badge-status badge-rejected">Past</span>
+                                        </div>
+                                    </div>
+
+                                    <p class="subtle-text mb-3">
+                                        @{
+                                            var shortDescription = item.Description.Length > 120
+                                                ? item.Description.Substring(0, 120) + "..."
+                                                : item.Description;
+                                        }
+                                        @shortDescription
+                                    </p>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-6">
+                                            <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                                <div class="data-label mb-1">Event Date</div>
+                                                <div class="subtle-text">@item.EventDate.ToString("MMM dd, yyyy")</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                                <div class="data-label mb-1">Time</div>
+                                                <div class="subtle-text">@item.EventDate.ToString("hh:mm tt")</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                                <div class="data-label mb-1">Capacity</div>
+                                                <div class="subtle-text">@item.Capacity participants</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                                                <div class="data-label mb-1">Status</div>
+                                                <div class="mt-1">
+                                                    <span class="badge badge-status badge-approved">Approved</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-auto d-flex flex-wrap gap-2">
+                                        <a asp-action="ApprovedDetails" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                            View Details
+                                        </a>
+
+                                        @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("StaffCoordinator"))
+                                        {
+                                            <a asp-action="ManageAttendance"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-warning btn-sm">
+                                                Attendance
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}

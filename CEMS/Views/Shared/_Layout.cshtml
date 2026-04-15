@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CEMS Portal</title>
+
+    <script type="importmap"></script>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CEMS.styles.css" asp-append-version="true" />
+</head>
+<body>
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<header>
+    <nav class="navbar navbar-expand-lg border-bottom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
+                <span class="fw-bold">CEMS Portal</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "Home" && currentAction == "Index" ? "active-nav" : "")"
+                           asp-area="" asp-controller="Home" asp-action="Index">
+                            Home
+                        </a>
+                    </li>
+
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Events" && (currentAction == "ApprovedEvents" || currentAction == "ApprovedDetails") ? "active-nav" : "")"
+                               asp-controller="Events" asp-action="ApprovedEvents">
+                                Approved Events
+                            </a>
+                        </li>
+
+                        @if (User.IsInRole("Student"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Events" && currentAction == "MyRegistrations" ? "active-nav" : "")"
+                                   asp-controller="Events" asp-action="MyRegistrations">
+                                    My Registrations
+                                </a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("Organizer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Events" && currentAction == "MyDashboard" ? "active-nav" : "")"
+                                   asp-controller="Events" asp-action="MyDashboard">
+                                    My Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Events" && (currentAction == "Index" || currentAction == "Details" || currentAction == "Edit" || currentAction == "Delete") ? "active-nav" : "")"
+                                   asp-controller="Events" asp-action="Index">
+                                    My Events
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Events" && currentAction == "Create" ? "active-nav" : "")"
+                                   asp-controller="Events" asp-action="Create">
+                                    Create Event
+                                </a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("StaffCoordinator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Events" && (currentAction == "PendingApproval" || currentAction == "ManageAttendance") ? "active-nav" : "")"
+                                   asp-controller="Events" asp-action="PendingApproval">
+                                    Pending Approval
+                                </a>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Events" && (currentAction == "ApprovedEvents" || currentAction == "ApprovedDetails") ? "active-nav" : "")"
+                               asp-controller="Events" asp-action="ApprovedEvents">
+                                Browse Events
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+                <div class="d-flex align-items-center ms-lg-3">
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container py-4">
+    <main role="main" class="reveal-on-scroll">
+        @RenderBody()
+    </main>
+</div>
+
+<footer class="footer-custom border-top mt-5">
+    <div class="container">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="fw-bold text-dark">CEMS Portal</div>
+                <div class="subtle-text">Campus Event Management System</div>
+            </div>
+
+            <div class="col-md-6 text-md-end">
+                <div class="subtle-text">&copy; 2026 - All rights reserved</div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div class="modal fade" id="confirmActionModal" tabindex="-1" aria-labelledby="confirmActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="confirmActionModalLabel">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body pt-2">
+                <p id="confirmActionMessage" class="mb-0 subtle-text">
+                    Are you sure you want to continue?
+                </p>
+            </div>
+
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmActionButton">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

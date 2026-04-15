@@ -1,0 +1,235 @@
+﻿@model CEMS.Models.Event
+
+@{
+    ViewData["Title"] = "Event Details";
+
+    bool isAuthenticated = User.Identity != null && User.Identity.IsAuthenticated;
+    bool isStudent = User.IsInRole("Student");
+    bool isAlreadyRegistered = ViewBag.IsAlreadyRegistered != null && (bool)ViewBag.IsAlreadyRegistered;
+    int remainingSeats = ViewBag.RemainingSeats != null ? (int)ViewBag.RemainingSeats : 0;
+    int currentRegistrations = ViewBag.CurrentRegistrationCount != null ? (int)ViewBag.CurrentRegistrationCount : 0;
+
+    int capacity = Model.Capacity <= 0 ? 1 : Model.Capacity;
+    int progressPercent = (int)Math.Round((double)currentRegistrations / capacity * 100);
+
+    if (progressPercent < 0) { progressPercent = 0; }
+    if (progressPercent > 100) { progressPercent = 100; }
+
+    bool isUpcoming = Model.EventDate >= DateTime.Now;
+}
+
+<div class="page-header">
+    <h1 class="page-title">Event Details</h1>
+    <p class="page-subtitle">
+        Review the event information, seat availability, and registration status before joining.
+    </p>
+</div>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info mb-4">
+        @TempData["Message"]
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="content-card h-100">
+
+            @if (Model.ImageData != null && Model.ImageContentType != null)
+            {
+                var base64 = Convert.ToBase64String(Model.ImageData);
+                var imageSrc = $"data:{Model.ImageContentType};base64,{base64}";
+
+                <div class="mb-4">
+                    <img src="@imageSrc"
+                         alt="@Model.Title"
+                         class="img-fluid rounded-soft border-soft w-100"
+                         style="max-height: 380px; object-fit: cover;" />
+                </div>
+            }
+
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                    <h2 class="mb-2">@Model.Title</h2>
+                    <p class="subtle-text mb-0">
+                        Below is the full event information including schedule, location, capacity, and current registration status.
+                    </p>
+                </div>
+
+                <div class="d-flex flex-column gap-2 align-items-end">
+                    @if (Model.Status == "Pending")
+                    {
+                        <span class="badge badge-status badge-pending">Pending</span>
+                    }
+                    else if (Model.Status == "Approved")
+                    {
+                        <span class="badge badge-status badge-approved">Approved</span>
+                    }
+                    else if (Model.Status == "Rejected")
+                    {
+                        <span class="badge badge-status badge-rejected">Rejected</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@Model.Status</span>
+                    }
+
+                    @if (isUpcoming)
+                    {
+                        <span class="badge badge-status badge-approved">Upcoming</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-status badge-rejected">Past</span>
+                    }
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="mb-4">
+                <h5 class="mb-2">Description</h5>
+                <p class="mb-0 subtle-text">@Model.Description</p>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                        <div class="data-label mb-1">Event Date</div>
+                        <div class="data-value">@Model.EventDate.ToString("dddd, MMM dd, yyyy - hh:mm tt")</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                        <div class="data-label mb-1">Location</div>
+                        <div class="data-value">@Model.Location</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                        <div class="data-label mb-1">Capacity Status</div>
+                        <div class="subtle-text">
+                            @currentRegistrations of @Model.Capacity seats are currently filled.
+                        </div>
+
+                        <div class="progress mt-3" style="height: 10px; border-radius: 999px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: @progressPercent%;"
+                                 aria-valuenow="@progressPercent"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+
+                        <div class="subtle-text mt-2">
+                            @progressPercent% of available seats are filled.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border-soft rounded-soft p-3 h-100 bg-white">
+                        <div class="data-label mb-1">Availability</div>
+
+                        @if (remainingSeats > 0)
+                        {
+                            <div class="fw-bold text-success">@remainingSeats seats remaining</div>
+                            <div class="subtle-text mt-1">Registration is currently available.</div>
+                        }
+                        else
+                        {
+                            <div class="fw-bold text-danger">Event Full</div>
+                            <div class="subtle-text mt-1">No seats are currently available.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="content-card h-100">
+            <h4 class="mb-3">Registration Summary</h4>
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="border-soft rounded-soft p-3 bg-white">
+                        <div class="data-label mb-1">Capacity</div>
+                        <div class="stat-number">@Model.Capacity</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="border-soft rounded-soft p-3 bg-white">
+                        <div class="data-label mb-1">Current Registrations</div>
+                        <div class="stat-number">@currentRegistrations</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="border-soft rounded-soft p-3 bg-white">
+                        <div class="data-label mb-1">Remaining Seats</div>
+                        <div class="stat-number">@remainingSeats</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="mt-2">
+                @if (!isAuthenticated)
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary w-100">
+                        Login to Register
+                    </a>
+                }
+                else if (!isStudent)
+                {
+                    <button class="btn btn-outline-secondary w-100" disabled>
+                        Registration Available for Students Only
+                    </button>
+                }
+                else if (isAlreadyRegistered)
+                {
+                    <button class="btn btn-success w-100" disabled>
+                        Already Registered
+                    </button>
+                }
+                else if (remainingSeats <= 0)
+                {
+                    <button class="btn btn-secondary w-100" disabled>
+                        Event Full
+                    </button>
+                }
+                else
+                {
+                    <form asp-action="RegisterForEvent" asp-route-id="@Model.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-primary w-100">
+                            Register for this Event
+                        </button>
+                    </form>
+                }
+            </div>
+
+            <div class="mt-3">
+                @if (isAuthenticated && isStudent)
+                {
+                    <a asp-controller="Events" asp-action="MyRegistrations" class="btn btn-outline-secondary w-100">
+                        View My Registrations
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="ApprovedEvents" class="btn btn-outline-secondary w-100">
+                        Back to Approved Events
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
