@@ -3,6 +3,4 @@ obj/
 .git/
 .vs/
 .idea/
-*.user
-*.suo
 app.db
