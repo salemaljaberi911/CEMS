@@ -1,0 +1,9 @@
+﻿bin/
+obj/
+.idea/
+.vs/
+*.user
+*.suo
+*.db
+*.sqlite
+appsettings.Development.json
