@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace CEMS.Data.Migrations
+namespace CEMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260416010602_InitialCreatePostgres")]
-    partial class InitialCreatePostgres
+    [Migration("20260416025712_InitialCleanPostgres")]
+    partial class InitialCleanPostgres
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
