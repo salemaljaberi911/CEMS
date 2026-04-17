@@ -4,12 +4,12 @@
     ViewData["Title"] = "Approved Events";
 
     var upcomingEvents = Model
-        .Where(e => e.EventDate >= DateTime.Now)
+        .Where(e => e.EventDate < DateTime.UtcNow)
         .OrderBy(e => e.EventDate)
         .ToList();
 
     var pastEvents = Model
-        .Where(e => e.EventDate < DateTime.Now)
+        .Where(e => e.EventDate >= DateTime.UtcNow)
         .OrderByDescending(e => e.EventDate)
         .ToList();
 }

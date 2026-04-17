@@ -15,7 +15,7 @@
     if (progressPercent < 0) { progressPercent = 0; }
     if (progressPercent > 100) { progressPercent = 100; }
 
-    bool isUpcoming = Model.EventDate >= DateTime.Now;
+    bool isUpcoming = Model.EventDate >= DateTime.UtcNow;
 }
 
 <div class="page-header">

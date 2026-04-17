@@ -226,7 +226,7 @@ namespace CEMS.Controllers
                 return Challenge();
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var myEventsQuery = _context.Events
                 .Where(e => e.OrganizerId == currentUser.Id);

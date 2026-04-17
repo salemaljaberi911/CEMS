@@ -12,8 +12,7 @@
 
         public int RegistrationCount { get; set; }
         public int RemainingSeats => Capacity - RegistrationCount;
-        public bool IsUpcoming => EventDate >= DateTime.Now;
-
+        public bool IsUpcoming => EventDate >= DateTime.UtcNow;
         public byte[]? ImageData { get; set; }
         public string? ImageContentType { get; set; }
     }

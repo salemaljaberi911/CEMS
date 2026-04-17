@@ -12,7 +12,7 @@ namespace CEMS.Models
         [Required]
         public string UserId { get; set; } = string.Empty;
 
-        public DateTime RegisteredAt { get; set; } = DateTime.Now;
+        public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
         
         public bool IsAttended { get; set; } = false;
     }
