@@ -100,6 +100,7 @@ namespace CEMS.Controllers
 
             newEvent.OrganizerId = currentUser.Id;
             newEvent.Status = PendingStatus;
+            newEvent.EventDate = DateTime.SpecifyKind(newEvent.EventDate, DateTimeKind.Local).ToUniversalTime();
 
             if (imageFile != null && imageFile.Length > 0)
             {
@@ -110,7 +111,6 @@ namespace CEMS.Controllers
                 newEvent.ImageContentType = imageFile.ContentType;
                 newEvent.ImageFileName = imageFile.FileName;
             }
-
             _context.Events.Add(newEvent);
             await _context.SaveChangesAsync();
 
@@ -159,7 +159,7 @@ namespace CEMS.Controllers
             {
                 existingEvent.Title = editedEvent.Title;
                 existingEvent.Description = editedEvent.Description;
-                existingEvent.EventDate = editedEvent.EventDate;
+                existingEvent.EventDate = DateTime.SpecifyKind(editedEvent.EventDate, DateTimeKind.Local).ToUniversalTime();
                 existingEvent.Location = editedEvent.Location;
                 existingEvent.Capacity = editedEvent.Capacity;
 
@@ -370,7 +370,7 @@ namespace CEMS.Controllers
             {
                 EventId = id,
                 UserId = currentUser.Id,
-                RegisteredAt = DateTime.Now
+                RegisteredAt = DateTime.UtcNow
             };
 
             _context.Registrations.Add(registration);
