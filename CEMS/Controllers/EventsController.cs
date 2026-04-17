@@ -514,12 +514,15 @@ namespace CEMS.Controllers
                         EventId = registration.EventId,
                         UserId = registration.UserId,
                         Email = user.Email ?? "No Email",
-                        FullName = user.FullName,
+                        FullName = ((user.FirstName ?? "") + " " + (user.LastName ?? "")).Trim(),
                         RegisteredAt = registration.RegisteredAt,
                         IsAttended = registration.IsAttended
                     })
-                .OrderBy(r => r.FullName)
                 .ToListAsync();
+
+            registrations = registrations
+                .OrderBy(r => r.FullName)
+                .ToList();
 
             ViewBag.EventId = id;
             ViewBag.EventTitle = selectedEvent.Title;
